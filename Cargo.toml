@@ -3,7 +3,7 @@ name = "alice-waf"
 version = "1.0.0"
 edition = "2021"
 authors = ["Moroya Sakamoto"]
-license = "MIT"
+license = "AGPL-3.0"
 description = "ALICE Web Application Firewall — rule engine, SQLi/XSS detection, IP filtering, rate limiting, OWASP patterns"
 
 [lib]
