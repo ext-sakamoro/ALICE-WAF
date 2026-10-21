@@ -360,7 +360,7 @@ fn header_injection_clean() {
 #[test]
 fn ip_filter_blocklist() {
     let mut f = IpFilter::new();
-    let ip: IpAddr = "192.168.1.100".parse().unwrap();
+    let ip: IpAddr = "198.51.100.100".parse().unwrap();
     f.add_to_blocklist(ip);
     assert_eq!(f.check(&ip), Action::Block);
     assert!(f.is_blocked(&ip));
@@ -369,8 +369,8 @@ fn ip_filter_blocklist() {
 #[test]
 fn ip_filter_allowlist_only() {
     let mut f = IpFilter::new();
-    let allowed: IpAddr = "10.0.0.1".parse().unwrap();
-    let other: IpAddr = "10.0.0.2".parse().unwrap();
+    let allowed: IpAddr = "192.0.2.1".parse().unwrap();
+    let other: IpAddr = "192.0.2.2".parse().unwrap();
     f.add_to_allowlist(allowed);
     f.set_allowlist_only(true);
     assert_eq!(f.check(&allowed), Action::Allow);
@@ -380,7 +380,7 @@ fn ip_filter_allowlist_only() {
 #[test]
 fn ip_filter_blocklist_overrides_allowlist() {
     let mut f = IpFilter::new();
-    let ip: IpAddr = "10.0.0.1".parse().unwrap();
+    let ip: IpAddr = "192.0.2.1".parse().unwrap();
     f.add_to_allowlist(ip);
     f.add_to_blocklist(ip);
     f.set_allowlist_only(true);
@@ -429,7 +429,7 @@ fn ip_filter_no_duplicate_add() {
 #[test]
 fn rate_limiter_allows_within_limit() {
     let limiter = RateLimiter::new(5, Duration::from_secs(60));
-    let ip: IpAddr = "10.0.0.1".parse().unwrap();
+    let ip: IpAddr = "192.0.2.1".parse().unwrap();
     for _ in 0..5 {
         assert!(limiter.allow(&ip));
     }
@@ -438,7 +438,7 @@ fn rate_limiter_allows_within_limit() {
 #[test]
 fn rate_limiter_blocks_over_limit() {
     let limiter = RateLimiter::new(3, Duration::from_secs(60));
-    let ip: IpAddr = "10.0.0.1".parse().unwrap();
+    let ip: IpAddr = "192.0.2.1".parse().unwrap();
     for _ in 0..3 {
         assert!(limiter.allow(&ip));
     }
@@ -448,8 +448,8 @@ fn rate_limiter_blocks_over_limit() {
 #[test]
 fn rate_limiter_independent_ips() {
     let limiter = RateLimiter::new(2, Duration::from_secs(60));
-    let ip1: IpAddr = "10.0.0.1".parse().unwrap();
-    let ip2: IpAddr = "10.0.0.2".parse().unwrap();
+    let ip1: IpAddr = "192.0.2.1".parse().unwrap();
+    let ip2: IpAddr = "192.0.2.2".parse().unwrap();
     assert!(limiter.allow(&ip1));
     assert!(limiter.allow(&ip1));
     assert!(!limiter.allow(&ip1));
@@ -459,7 +459,7 @@ fn rate_limiter_independent_ips() {
 #[test]
 fn rate_limiter_remaining() {
     let limiter = RateLimiter::new(5, Duration::from_secs(60));
-    let ip: IpAddr = "10.0.0.1".parse().unwrap();
+    let ip: IpAddr = "192.0.2.1".parse().unwrap();
     assert_eq!(limiter.remaining(&ip), 5);
     limiter.allow(&ip);
     assert_eq!(limiter.remaining(&ip), 4);
@@ -468,7 +468,7 @@ fn rate_limiter_remaining() {
 #[test]
 fn rate_limiter_reset() {
     let limiter = RateLimiter::new(2, Duration::from_secs(60));
-    let ip: IpAddr = "10.0.0.1".parse().unwrap();
+    let ip: IpAddr = "192.0.2.1".parse().unwrap();
     limiter.allow(&ip);
     limiter.allow(&ip);
     assert!(!limiter.allow(&ip));
@@ -761,7 +761,7 @@ fn waf_blocks_header_injection() {
 #[test]
 fn waf_blocks_ip() {
     let mut waf = Waf::new();
-    let ip: IpAddr = "192.168.1.100".parse().unwrap();
+    let ip: IpAddr = "198.51.100.100".parse().unwrap();
     waf.ip_filter_mut().add_to_blocklist(ip);
     let req = Request::new("GET", "/").with_ip(ip);
     let v = waf.inspect(&req);
@@ -773,7 +773,7 @@ fn waf_blocks_ip() {
 fn waf_rate_limit() {
     let mut waf = Waf::new();
     waf.set_rate_limiter(RateLimiter::new(2, Duration::from_secs(60)));
-    let ip: IpAddr = "10.0.0.1".parse().unwrap();
+    let ip: IpAddr = "192.0.2.1".parse().unwrap();
     let req = Request::new("GET", "/").with_ip(ip);
     assert_eq!(waf.inspect(&req).action, Action::Allow);
     assert_eq!(waf.inspect(&req).action, Action::Allow);
